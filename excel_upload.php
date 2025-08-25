@@ -1,6 +1,22 @@
 <?php
+<<<<<<< HEAD
 require 'vendor/autoload.php'; // Include PHPSpreadsheet
 
+=======
+session_start();
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "questionsdb";
+
+$con = mysqli_connect($host, $user, $pass, $db);
+
+if(!$con){
+    die("Database connection failed: " . mysqli_connect_error());
+}
+
+require __DIR__ . '/vendor/autoload.php';
+>>>>>>> cb5a0d6dc0f1a6721fd88a3a0b6b1c5df1ef2166
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 // Database connection settings
@@ -12,6 +28,7 @@ $dbname = "mcq_db"; // Change to your database name
 // Create connection
 $conn = new mysqli($servername, $username, $password);
 
+<<<<<<< HEAD
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -52,6 +69,31 @@ $sql = "CREATE TABLE IF NOT EXISTS mcqs (
     Options_Ta_JSON TEXT,
     Correct_Answer_Text_En TEXT
 )";
+=======
+        $count = 0;
+        foreach($data as $row)
+        {
+            if($count > 0) // Skip header
+            {
+                $q_no             = mysqli_real_escape_string($con, $row[0]);
+                $English_Q        = mysqli_real_escape_string($con, $row[1]);
+                $E_List_1         = mysqli_real_escape_string($con, $row[2]);
+                $E_List_2         = mysqli_real_escape_string($con, $row[3]);
+                $E_options        = mysqli_real_escape_string($con, $row[4]);
+                $E_correct_option = mysqli_real_escape_string($con, $row[5]);
+                $Tamil_Q          = mysqli_real_escape_string($con, $row[6]);
+                $T_list_1         = mysqli_real_escape_string($con, $row[7]);
+                $T_list_2         = mysqli_real_escape_string($con, $row[8]);
+                $T_options        = mysqli_real_escape_string($con, $row[9]);
+                $T_correct_option = mysqli_real_escape_string($con, $row[10]);
+
+                $query = "INSERT INTO questions 
+                    (q_no, English_Q, E_List_1, E_List_2, E_options, E_correct_option, 
+                    Tamil_Q, T_list_1, T_list_2, T_options, T_correct_option)
+                    VALUES 
+                    ('$q_no', '$English_Q', '$E_List_1', '$E_List_2', '$E_options', '$E_correct_option',
+                     '$Tamil_Q', '$T_list_1', '$T_list_2', '$T_options', '$T_correct_option')";
+>>>>>>> cb5a0d6dc0f1a6721fd88a3a0b6b1c5df1ef2166
 
 if ($conn->query($sql) === TRUE) {
     echo "Table created successfully or already exists<br>";
@@ -91,6 +133,7 @@ if (isset($_FILES['excel_file']) && $_FILES['excel_file']['error'] == UPLOAD_ERR
                 $isFirstRow = false;
                 continue; // Skip header row
             }
+<<<<<<< HEAD
 
             // Map Excel row to database columns
             $data = [
@@ -136,6 +179,11 @@ if (isset($_FILES['excel_file']) && $_FILES['excel_file']['error'] == UPLOAD_ERR
                 echo "Record for Q_No {$data['Q_No']} inserted successfully<br>";
             } else {
                 echo "Error inserting record for Q_No {$data['Q_No']}: " . $conn->error . "<br>";
+=======
+            else
+            {
+                $count = 1; 
+>>>>>>> cb5a0d6dc0f1a6721fd88a3a0b6b1c5df1ef2166
             }
         }
 
