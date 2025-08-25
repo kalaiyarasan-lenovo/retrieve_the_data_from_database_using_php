@@ -57,9 +57,10 @@ echo "<style>
 
       <script>
         function showAnswer(qid, eCorrect, tCorrect) {
+            // Show the answer section
             document.getElementById('ans' + qid).style.display = 'block';
 
-            // Highlight English
+            // Highlight English correct answer
             if (eCorrect !== 'Not Available') {
                 let eOptions = document.getElementsByName('E_q' + qid);
                 eOptions.forEach(opt => {
@@ -72,7 +73,7 @@ echo "<style>
                 });
             }
 
-            // Highlight Tamil
+            // Highlight Tamil correct answer
             if (tCorrect !== 'Not Available') {
                 let tOptions = document.getElementsByName('T_q' + qid);
                 tOptions.forEach(opt => {
@@ -89,8 +90,8 @@ echo "<style>
 
 echo "<div class='container'>";
 
-// 2. Query for all questions from new table
-$sql = "SELECT * FROM mcq_questions";  
+// 2. Query for all questions
+$sql = "SELECT * FROM questions";  
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
@@ -98,35 +99,42 @@ if ($result->num_rows > 0) {
         echo "<div style='margin-bottom:30px;'>";
 
         // ================= ENGLISH QUESTION =================
-        echo "<p><strong>" . $row['q_no'] . ". " . htmlspecialchars($row['question_en']) . "</strong></p>";
+        echo "<p><strong>" . $row['q_no'] . ". " . htmlspecialchars($row['English_Q']) . "</strong></p>";
 
-        if (!empty($row['statement1_en'])) {
+        // English List 1
+        if (!empty($row['E_List_1'])) {
             echo "<h4>List 1:</h4>";
-            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['statement1_en']) . "</pre>";
+            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['E_List_1']) . "</pre>";
         }
-        if (!empty($row['statement2_en'])) {
+
+        // English List 2
+        if (!empty($row['E_List_2'])) {
             echo "<h4>List 2:</h4>";
-            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['statement2_en']) . "</pre>";
+            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['E_List_2']) . "</pre>";
         }
 
         // ================= TAMIL QUESTION =================
-        echo "<p style='margin-top:15px;'><strong>" . $row['q_no'] . ". " . htmlspecialchars($row['question_ta']) . "</strong></p>";
+        echo "<p style='margin-top:15px;'><strong>" . $row['q_no'] . ". " . htmlspecialchars($row['Tamil_Q']) . "</strong></p>";
 
-        if (!empty($row['statement1_ta'])) {
+        // Tamil List 1
+        if (!empty($row['T_list_1'])) {
             echo "<h4>பட்டியல் 1:</h4>";
-            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['statement1_ta']) . "</pre>";
+            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['T_list_1']) . "</pre>";
         }
-        if (!empty($row['statement2_ta'])) {
+
+        // Tamil List 2
+        if (!empty($row['T_list_2'])) {
             echo "<h4>பட்டியல் 2:</h4>";
-            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['statement2_ta']) . "</pre>";
+            echo "<pre style='background:#f4f4f4; padding:10px; border-radius:5px;'>" . htmlspecialchars($row['T_list_2']) . "</pre>";
         }
 
         // ================= ENGLISH OPTIONS =================
-        echo "<h4>English Options:</h4>";
-        foreach (['option_a_en','option_b_en','option_c_en','option_d_en'] as $col) {
-            if (!empty($row[$col])) {
-                $id = "E_{$row['q_no']}_$col";
-                $optionValue = htmlspecialchars(trim($row[$col]));
+        if (!empty($row['E_options'])) {
+            echo "<h4>English Options:</h4>";
+            $options = explode("\n", $row['E_options']);
+            foreach ($options as $i => $opt) {
+                $id = "E_{$row['q_no']}_$i";
+                $optionValue = htmlspecialchars(trim($opt));
                 echo "<label for='$id'>
                         <input type='radio' id='$id' name='E_q{$row['q_no']}' value='$optionValue'>
                         $optionValue
@@ -135,11 +143,12 @@ if ($result->num_rows > 0) {
         }
 
         // ================= TAMIL OPTIONS =================
-        echo "<h4>தமிழ் விருப்பங்கள்:</h4>";
-        foreach (['option_a_ta','option_b_ta','option_c_ta','option_d_ta'] as $col) {
-            if (!empty($row[$col])) {
-                $id = "T_{$row['q_no']}_$col";
-                $optionValue = htmlspecialchars(trim($row[$col]));
+        if (!empty($row['T_options'])) {
+            echo "<h4>தமிழ் விருப்பங்கள்:</h4>";
+            $toptions = explode("\n", $row['T_options']);
+            foreach ($toptions as $i => $topt) {
+                $id = "T_{$row['q_no']}_$i";
+                $optionValue = htmlspecialchars(trim($topt));
                 echo "<label for='$id'>
                         <input type='radio' id='$id' name='T_q{$row['q_no']}' value='$optionValue'>
                         $optionValue
@@ -147,9 +156,9 @@ if ($result->num_rows > 0) {
             }
         }
 
-        // ================= CORRECT ANSWERS =================
-        $englishAnswer = !empty($row['correct_answer_text_en']) ? htmlspecialchars($row['correct_answer_text_en']) : "Not Available";
-        $tamilAnswer   = !empty($row['answer_key']) ? htmlspecialchars($row['answer_key']) : "Not Available";  
+        // ================= BOTH CORRECT ANSWERS =================
+        $englishAnswer = !empty($row['E_correct_option']) ? htmlspecialchars($row['E_correct_option']) : "Not Available";
+        $tamilAnswer   = !empty($row['T_correct_option']) ? htmlspecialchars($row['T_correct_option']) : "Not Available";
 
         echo "<button onclick=\"showAnswer('{$row['q_no']}', '$englishAnswer', '$tamilAnswer')\" 
                 style='margin-top:15px; background:#f0ad4e; color:white; padding:8px 12px; border:none; border-radius:5px;'>
@@ -166,6 +175,6 @@ if ($result->num_rows > 0) {
     echo "No questions found.";
 }
 
-echo "</div>"; 
+echo "</div>"; // close container
 $conn->close();
 ?>
